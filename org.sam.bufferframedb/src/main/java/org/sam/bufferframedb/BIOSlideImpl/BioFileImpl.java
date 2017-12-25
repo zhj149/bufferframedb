@@ -181,4 +181,12 @@ public class BioFileImpl implements FileHelper<byte[]> {
 		randomFile.write(t);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean drop() throws Exception{
+		return this.file.delete();
+	}
+
 }

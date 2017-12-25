@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sam.bufferframedb.BIOSlideImpl.BIOSlideContextImpl;
+import org.sam.bufferframedb.BIOSlideImpl.BIOContextImpl;
 
 public class ReadTest {
 
@@ -25,7 +25,7 @@ public class ReadTest {
 
 		try {
 
-			testContext = BIOSlideContextImpl.connectTo(url, "test", 60);
+			testContext = BIOContextImpl.connectTo(url, "test", 60);
 			table = testContext.getTable();
 
 		} catch (Exception e) {
@@ -64,6 +64,11 @@ public class ReadTest {
 	 */
 	@After
 	public void destroy() {
-		testContext.close();
+		try {
+			testContext.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

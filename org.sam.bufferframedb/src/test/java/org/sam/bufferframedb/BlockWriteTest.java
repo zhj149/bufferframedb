@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sam.bufferframedb.BIOSlideImpl.BIOSlideContextImpl;
+import org.sam.bufferframedb.BIOSlideImpl.BIOContextImpl;
 
 /**
  * @author sam
@@ -50,7 +50,7 @@ public class BlockWriteTest {
 
 		try {
 
-			testContext = BIOSlideContextImpl.createNew(url, table, 60);
+			testContext = BIOContextImpl.createNew(url, table, 60);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -78,7 +78,7 @@ public class BlockWriteTest {
 			int iSize = table.getSize();
 			byte[] block = new byte[iSize * 5];
 
-			for (int i = 0; i < 10000; i++) {
+			for (int i = 0; i < 600000; i++) {
 				
 				for (int j = 0 ; j < 5; j++){
 					data.copyTo(table, block, iSize * j);
@@ -97,8 +97,13 @@ public class BlockWriteTest {
 	 */
 	@After
 	public void destroy() {
-		testContext.flush();
-		testContext.close();
+		try {
+			testContext.flush();
+			testContext.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

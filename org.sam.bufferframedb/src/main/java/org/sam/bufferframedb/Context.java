@@ -125,16 +125,19 @@ public interface Context extends Serializable {
 	
 	/**
 	 * 全部存盘
+	 * @throws Exception
 	 */
-	public void flush();
+	public void flush() throws Exception;
 	
 	/**
 	 * 关系连接
+	 * @throws Exception
 	 */
-	public void close();
+	public void close() throws Exception;
 	
 	/**
 	 * 删除当前数据表
+	 * @throws Exception
 	 */
-	public void drop();
+	public void drop() throws Exception;
 }

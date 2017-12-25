@@ -26,4 +26,22 @@ public interface Slide extends Serializable, Cloneable {
 	 * @param bufferSize
 	 */
 	public void setBufferSize(int bufferSize);
+	
+	/**
+	 * 开始异步读取的操作
+	 * @throws Exception
+	 */
+	public void execute() throws Exception;
+	
+	/**
+	 * 关闭异步读取
+	 * @throws Exception
+	 */
+	public void shutdown() throws Exception;
+	
+	/**
+	 * 清空缓存
+	 * @throws Exception
+	 */
+	public void clear() throws Exception;
 }

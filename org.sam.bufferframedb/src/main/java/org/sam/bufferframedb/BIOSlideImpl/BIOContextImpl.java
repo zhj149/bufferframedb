@@ -13,12 +13,13 @@ import org.sam.bufferframedb.Slide;
 import org.sam.bufferframedb.Table;
 
 /**
- * NIO实现的具有滑动窗口缓存方式的文件数据库上下文管理对象
+ * BIO实现的文件数据库上下文管理对象
+ * 无缓存
  * 
  * @author sam
  *
  */
-public class BIOSlideContextImpl implements Context, Slide {
+public class BIOContextImpl implements Context {
 
 	private static final long serialVersionUID = -222690099709663975L;
 
@@ -139,7 +140,7 @@ public class BIOSlideContextImpl implements Context, Slide {
 	 * @return 表操作上下文对象
 	 * @throws Exception 
 	 */
-	public static BIOSlideContextImpl createNew(String url, Table table, int buffer) throws Exception {
+	public static BIOContextImpl createNew(String url, Table table, int buffer) throws Exception {
 		
 		if (url == null || url.length() <= 0)
 			throw new Exception("url not define");
@@ -150,7 +151,7 @@ public class BIOSlideContextImpl implements Context, Slide {
 		if (buffer <= 0)
 			buffer = Slide.DEFAULT_BUFFER_SIZE;
 		
-		BIOSlideContextImpl context = new BIOSlideContextImpl();
+		BIOContextImpl context = new BIOContextImpl();
 		context.setUrl(url);
 		String baseName = url;
 		if (!url.endsWith("/") && !url.endsWith("\\") )
@@ -192,7 +193,7 @@ public class BIOSlideContextImpl implements Context, Slide {
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
-	public static BIOSlideContextImpl connectTo(String url, String table, int buffer) throws Exception {
+	public static BIOContextImpl connectTo(String url, String table, int buffer) throws Exception {
 		
 		if (url == null || url.length() <= 0)
 			throw new Exception("url not define");
@@ -203,7 +204,7 @@ public class BIOSlideContextImpl implements Context, Slide {
 		if (buffer <= 0)
 			buffer = Slide.DEFAULT_BUFFER_SIZE;
 		
-		BIOSlideContextImpl context = new BIOSlideContextImpl();
+		BIOContextImpl context = new BIOContextImpl();
 		context.setUrl(url);
 		String baseName = url;
 		if (!url.endsWith("/") && !url.endsWith("\\") )
@@ -236,7 +237,7 @@ public class BIOSlideContextImpl implements Context, Slide {
 	 * 防止开发人员乱用系统
 	 * 
 	 */
-	private BIOSlideContextImpl() {
+	private BIOContextImpl() {
 		
 	}
 	
@@ -384,7 +385,7 @@ public class BIOSlideContextImpl implements Context, Slide {
 	 */
 	@Override
 	public void remove(long frame) throws Exception {
-
+		
 	}
 
 	/**
@@ -392,7 +393,7 @@ public class BIOSlideContextImpl implements Context, Slide {
 	 */
 	@Override
 	public void update(long frame, byte[] data) throws Exception {
-
+		
 	}
 
 	/**
@@ -400,14 +401,15 @@ public class BIOSlideContextImpl implements Context, Slide {
 	 */
 	@Override
 	public void move2Frame(long frame) {
-
+		this.frame.set(frame);
+		this.size.set(this.table.getSize() * (frame - 1));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void flush() {
+	public void flush() throws Exception{
 		try {
 			this.tableFileHelper.write(this.table);
 			this.indexFileHelper.write(this.indexs);
@@ -419,7 +421,7 @@ public class BIOSlideContextImpl implements Context, Slide {
 	/**
 	 *  {@inheritDoc}
 	 */
-	public void close(){
+	public void close() throws Exception{
 		try {
 			this.tableFileHelper.close();
 			this.indexFileHelper.close();
@@ -432,24 +434,10 @@ public class BIOSlideContextImpl implements Context, Slide {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void drop() {
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getBufferSize() {
-		return 0;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setBufferSize(int bufferSize) {
-
+	public void drop() throws Exception {
+		this.dataFileHelper.close();
+		this.tableFileHelper.close();
+		this.indexFileHelper.close();
 	}
 
 	// end

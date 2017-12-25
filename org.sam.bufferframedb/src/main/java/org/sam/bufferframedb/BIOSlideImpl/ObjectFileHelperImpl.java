@@ -233,5 +233,11 @@ public class ObjectFileHelperImpl implements FileHelper<Object> {
 		oos.writeObject(t);
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean drop() throws Exception{
+		return this.file.delete();
+	}
 }

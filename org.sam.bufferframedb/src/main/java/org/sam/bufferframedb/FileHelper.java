@@ -1,5 +1,6 @@
 package org.sam.bufferframedb;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -8,6 +9,19 @@ import java.io.IOException;
  *
  */
 public interface FileHelper<T> {
+	
+	/**
+	 * 删除文件
+	 * @return true正确删除
+	 * @throws Exception
+	 */
+	public boolean drop() throws Exception;
+	
+	/**
+	 * 拿到文件操作对象
+	 * @return
+	 */
+	public File getFile();
 
 	/**
 	 * 文件地址
@@ -23,7 +37,7 @@ public interface FileHelper<T> {
 	
 	/**
 	 * 链接到文件 读写模式
-	 * <br>文件不存在则创建一个新文件
+	 * <br>文件不存在则创建一个新文件                                    
 	 * @return true 链接成功 false失败（创建文件不成功）
 	 * @throws IOException 抛出异常
 	 */

@@ -1,13 +1,11 @@
 package org.sam.bufferframedb;
 
-import static org.junit.Assert.*;
-
 import java.util.Map.Entry;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sam.bufferframedb.BIOSlideImpl.BIOSlideContextImpl;
+import org.sam.bufferframedb.BIOSlideImpl.BIOContextImpl;
 
 public class BlockReadTest {
 
@@ -24,7 +22,7 @@ public class BlockReadTest {
 
 		try {
 
-			testContext = BIOSlideContextImpl.connectTo(url, "block", 60);
+			testContext = BIOContextImpl.connectTo(url, "block", 60);
 			table = testContext.getTable();
 
 		} catch (Exception e) {

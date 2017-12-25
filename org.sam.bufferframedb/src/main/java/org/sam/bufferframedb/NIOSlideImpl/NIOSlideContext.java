@@ -185,5 +185,23 @@ public class NIOSlideContext implements Context , Slide {
 		return null;
 	}
 
+	@Override
+	public void execute() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void shutdown() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clear() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 	//end
 }

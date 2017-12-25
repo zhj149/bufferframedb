@@ -3,7 +3,7 @@ package org.sam.bufferframedb;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sam.bufferframedb.BIOSlideImpl.BIOSlideContextImpl;
+import org.sam.bufferframedb.BIOSlideImpl.BIOContextImpl;
 
 /**
  * 写入测试
@@ -41,7 +41,7 @@ public class WriteTest {
 
 		try {
 
-			testContext = BIOSlideContextImpl.createNew(url, table, 60);
+			testContext = BIOContextImpl.createNew(url, table, 60);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -82,7 +82,12 @@ public class WriteTest {
 	 */
 	@After
 	public void destroy() {
-		testContext.flush();
-		testContext.close();
+		try {
+			testContext.flush();
+			testContext.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
