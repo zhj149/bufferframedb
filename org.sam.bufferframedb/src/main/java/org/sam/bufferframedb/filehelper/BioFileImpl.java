@@ -1,10 +1,8 @@
-package org.sam.bufferframedb.BIOSlideImpl;
+package org.sam.bufferframedb.filehelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
-import org.sam.bufferframedb.FileHelper;
 
 /**
  * bio的file文件操作对象
@@ -43,6 +41,7 @@ public class BioFileImpl implements FileHelper<byte[]> {
 	 * 当前操作的文件对象
 	 * @return
 	 */
+	@Override
 	public File getFile() {
 		return file;
 	}

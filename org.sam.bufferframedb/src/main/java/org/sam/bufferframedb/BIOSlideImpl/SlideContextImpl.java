@@ -14,56 +14,61 @@ import org.sam.bufferframedb.Table;
 
 /**
  * BIO实现的，装饰器实现的多线程，带有缓存的文件数据操作上下文对象
+ * 
  * @author sam
  *
  */
-public class SlideContextImpl implements Context, Slide {
+public class SlideContextImpl implements Context<byte[]>, Slide {
 
 	private static final long serialVersionUID = -7709843134851744374L;
 
 	/**
 	 * 被装饰的文件操作上下文对象
 	 */
-	private Context context;
-	
+	private Context<byte[]> context;
+
 	/**
 	 * 线程池对象
 	 */
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
-	
+
 	/**
 	 * 当前的缓存数据队列
 	 */
 	private BlockingQueue<byte[]> queue = new LinkedBlockingQueue<>();
-	
-	/**
-	 * 被装饰的文件操作上下文对象
-	 * @return
-	 */
-	public Context getContext() {
-		return context;
-	}
-	
-	/**
-	 * 缓存数量
-	 */
-	private volatile int bufferSize = 0;
 
 	/**
 	 * 被装饰的文件操作上下文对象
-	 * @param context
+	 * 
+	 * @return
 	 */
-	public void setContext(Context context) {
-		this.context = context;
+	public Context<byte[]> getContext() {
+		return context;
 	}
+
+	/**
+	 * 缓存数量
+	 */
+	private volatile int bufferSize = Slide.DEFAULT_BUFFER_SIZE;
 	
 	/**
-	 * BIO实现的，装饰器实现的多线程，带有缓存的文件数据操作上下文对象
-	 * @param context 数据上下文
+	 * 被装饰的文件操作上下文对象
+	 * 
+	 * @param context
 	 */
-	public SlideContextImpl(Context context){
+	public void setContext(Context<byte[]> context) {
+		this.context = context;
+	}
+
+	/**
+	 * BIO实现的，装饰器实现的多线程，带有缓存的文件数据操作上下文对象
+	 * 
+	 * @param context
+	 *            数据上下文
+	 */
+	public SlideContextImpl(Context<byte[]> context) {
 		this.setContext(context);
-		
+
 	}
 
 	/**
@@ -81,40 +86,44 @@ public class SlideContextImpl implements Context, Slide {
 	public void setBufferSize(int bufferSize) {
 		this.bufferSize = bufferSize;
 	}
-	
+
 	/**
 	 * 开始异步读取的操作
+	 * 
 	 * @throws Exception
 	 */
-	public void execute() throws Exception{
+	public void execute() throws Exception {
 		this.executor.execute(() -> {
-			if (this.queue.size() < this.bufferSize){
+			while (this.context.getFrame() <= this.context.getMaxFrame()) {
 				try {
-					
-					byte[] read = this.context.read();
-					if (read != null)
-						this.queue.add(read);
-					
+					if (this.queue.size() < this.bufferSize) {
+						byte[] read = this.context.read();
+						if (read != null)
+							this.queue.add(read);
+					}
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
-	
+
 	/**
 	 * 关闭异步读取
+	 * 
 	 * @throws Exception
 	 */
-	public void shutdown() throws Exception{
+	public void shutdown() throws Exception {
 		this.executor.shutdown();
 	}
-	
+
 	/**
 	 * 清空缓存
+	 * 
 	 * @throws Exception
 	 */
-	public void clear() throws Exception{
+	public void clear() throws Exception {
 		this.queue.clear();
 	}
 
@@ -261,6 +270,59 @@ public class SlideContextImpl implements Context, Slide {
 	public void drop() throws Exception {
 		this.shutdown();
 		this.context.drop();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getFrame() {
+		return 0;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int size() {
+		return this.context.size();
+	}
+
+	@Override
+	public Index append(long frame, byte[] data) throws Exception {
+		return this.context.append(frame, data);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Index insert(long before, long frame, byte[] data) throws Exception {
+		return this.context.insert(before, frame, data);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getMaxFrame() {
+		return this.context.getMaxFrame();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getMinFrame() {
+		return this.context.getMinFrame();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getNextFrame() {
+		return this.context.getNextFrame();
 	}
 
 }

@@ -234,7 +234,7 @@ public class Data implements Serializable, Cloneable {
 	 * @param skip 偏移量
 	 * @throws Exception
 	 */
-	public void copyTo(Table table, byte[] target , int skip) throws Exception {
+	public void code(Table table, byte[] target , int skip) throws Exception {
 		if (table == null || StringUtils.isEmpty(table.getName()))
 			throw new Exception("table not define");
 
@@ -305,7 +305,7 @@ public class Data implements Serializable, Cloneable {
 	 * @param skip
 	 * @throws Exception
 	 */
-	public void decodeFrom(Table table, byte[] source , int skip) throws Exception{
+	public void decode(Table table, byte[] source , int skip) throws Exception{
 		this.datas.clear();
 
 		if (table == null || StringUtils.isEmpty(table.getName()))

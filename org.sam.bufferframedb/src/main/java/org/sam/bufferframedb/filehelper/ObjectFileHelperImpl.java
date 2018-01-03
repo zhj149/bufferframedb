@@ -1,4 +1,4 @@
-package org.sam.bufferframedb.BIOSlideImpl;
+package org.sam.bufferframedb.filehelper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
-import org.sam.bufferframedb.FileHelper;
 
 /**
  * 使用流写入的对象

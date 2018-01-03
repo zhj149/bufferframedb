@@ -1,4 +1,4 @@
-package org.sam.bufferframedb;
+package org.sam.bufferframedb.filehelper;
 
 import java.io.File;
 import java.io.IOException;
