@@ -50,7 +50,7 @@ public class SlideContextImpl implements Context<byte[]>, Slide {
 	 * 缓存数量
 	 */
 	private volatile int bufferSize = Slide.DEFAULT_BUFFER_SIZE;
-	
+
 	/**
 	 * 被装饰的文件操作上下文对象
 	 * 
@@ -94,10 +94,10 @@ public class SlideContextImpl implements Context<byte[]>, Slide {
 	 */
 	public void execute() throws Exception {
 		this.executor.execute(() -> {
-			while (this.context.getFrame() <= this.context.getMaxFrame()) {
+			while (this.context.hasNext()) {
 				try {
 					if (this.queue.size() < this.bufferSize) {
-						byte[] read = this.context.read();
+						byte[] read = this.context.next();
 						if (read != null)
 							this.queue.add(read);
 					}
@@ -195,14 +195,6 @@ public class SlideContextImpl implements Context<byte[]>, Slide {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public byte[] read() throws Exception {
-		return this.queue.take();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public Index append(byte[] data) throws Exception {
 		return this.context.append(data);
 	}
@@ -238,6 +230,7 @@ public class SlideContextImpl implements Context<byte[]>, Slide {
 	public void move2Frame(long frame) {
 		try {
 			this.shutdown();
+			this.queue.clear();
 			this.context.move2Frame(frame);
 			this.execute();
 		} catch (Exception e) {
@@ -323,6 +316,30 @@ public class SlideContextImpl implements Context<byte[]>, Slide {
 	@Override
 	public long getNextFrame() {
 		return this.context.getNextFrame();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasNext() {
+		return this.queue.size() > 0;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public byte[] next() {
+
+		byte[] result = null;
+		
+		try {
+			result = this.queue.take();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 }

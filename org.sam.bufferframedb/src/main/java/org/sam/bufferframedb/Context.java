@@ -1,6 +1,7 @@
 package org.sam.bufferframedb;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  * @author sam
  *
  */
-public interface Context<T> extends Serializable {
+public interface Context<T> extends Iterator<T> , Serializable {
 
 	/**
 	 * 是否关闭时候顺便删除数据库
@@ -103,14 +104,6 @@ public interface Context<T> extends Serializable {
 	 * @throws Exception
 	 */
 	public T getFrame(long frame) throws Exception;
-
-	/**
-	 * 读取当前帧，并移动到下一帧
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	public T read() throws Exception;
 
 	/**
 	 * 将数据增加的末尾并返回新的索引对象副本，不影响真实的index数据 <br>

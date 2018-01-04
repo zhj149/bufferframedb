@@ -3,7 +3,7 @@ package org.sam.bufferframedb.BIOSlideImpl;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.sam.bufferframedb.AccessModel;
 import org.sam.bufferframedb.Context;
@@ -59,14 +59,9 @@ public class BIOContextImpl implements Context<byte[]> {
 	private FileHelper<byte[]> dataFileHelper;
 
 	/**
-	 * 当前索引
+	 * 当前帧索引
 	 */
-	private AtomicLong index = new AtomicLong(0);
-
-	/**
-	 * 目前的总大小
-	 */
-	private AtomicLong size = new AtomicLong(0);
+	private AtomicInteger index = new AtomicInteger(0);
 
 	/**
 	 * 表文件助手
@@ -237,14 +232,19 @@ public class BIOContextImpl implements Context<byte[]> {
 
 	/**
 	 * 创建一个索引对象
-	 * @param newFrame 新的索引数据
+	 * 
+	 * @param newFrame
+	 *            新的索引数据
 	 * @return
 	 */
 	private Index createIndex(long newFrame) {
 
-		this.index.incrementAndGet();
-		Index result = new Index(newFrame, size.get(), 0);
-		return result;
+		int lastIndex = this.index.getAndIncrement();
+		if (lastIndex <= 0) {
+			return new Index(newFrame, 0, 0);
+		}
+		Index in = this.indexs.get(lastIndex - 1);
+		return new Index(newFrame, in.getSkip() + in.getSize(), 0);
 	}
 
 	// begin implements
@@ -337,17 +337,12 @@ public class BIOContextImpl implements Context<byte[]> {
 	 */
 	@Override
 	public byte[] getFrame(long frame) throws Exception {
-		return null;
-	}
+		int iFind = this.findIndex(frame);
+		if (iFind < 0)
+			return null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public byte[] read() throws Exception {
-		long f = index.getAndIncrement();
-		Index index = this.getIndexs().get((int) f);
-		long s = size.getAndAdd(index.getSize());
-		byte[] values = this.dataFileHelper.read(s, index.getSize());
+		Index index = this.getIndexs().get(iFind);
+		byte[] values = this.dataFileHelper.read(index.getSkip(), index.getSize());
 		return values;
 	}
 
@@ -361,7 +356,6 @@ public class BIOContextImpl implements Context<byte[]> {
 		Index index = this.createIndex(maxFrame + 1);
 
 		synchronized (this.indexs) {
-			this.size.addAndGet(data.length);
 			index.setSize(data.length);
 			this.indexs.add(index);
 			this.dataFileHelper.append(data);
@@ -376,9 +370,8 @@ public class BIOContextImpl implements Context<byte[]> {
 	public Index append(long frame, byte[] data) throws Exception {
 
 		Index index = this.createIndex(frame);
-		
+
 		synchronized (this.indexs) {
-			this.size.addAndGet(data.length);
 			index.setSize(data.length);
 			this.indexs.add(index);
 			this.dataFileHelper.append(data);
@@ -427,10 +420,8 @@ public class BIOContextImpl implements Context<byte[]> {
 		int iFind = this.findNearIndex(frame);
 		if (iFind < 0)
 			return;
-		
-		Index index = this.getIndexs().get(iFind);
+
 		this.index.set(iFind);
-		this.size.set(index.getBegin());
 	}
 
 	/**
@@ -473,7 +464,7 @@ public class BIOContextImpl implements Context<byte[]> {
 	 */
 	@Override
 	public long getFrame() {
-		return this.indexs.get((int)this.index.get()).getFrame();
+		return this.indexs.get((int) this.index.get()).getFrame();
 	}
 
 	/**
@@ -483,12 +474,13 @@ public class BIOContextImpl implements Context<byte[]> {
 	public int size() {
 		return this.indexs.size();
 	}
-	
+
 	/**
 	 * 获取第一帧
+	 * 
 	 * @return
 	 */
-	public long getMinFrame(){
+	public long getMinFrame() {
 		if (this.indexs == null || this.indexs.isEmpty())
 			return -1;
 
@@ -507,17 +499,41 @@ public class BIOContextImpl implements Context<byte[]> {
 		Index index = this.indexs.get(this.indexs.size() - 1);
 		return index.getFrame();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public long getNextFrame(){
-		int current = (int)this.index.get();
+	public long getNextFrame() {
+		int current = (int) this.index.get();
 		if (this.indexs == null || this.indexs.isEmpty() || current < 0 || current > this.indexs.size() - 1)
 			return -1;
-		
+
 		return this.indexs.get(current + 1).getFrame();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasNext() {
+		return this.indexs.size() > 0 && this.index.get() <= this.indexs.size();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public byte[] next() {
+		long f = index.getAndIncrement();
+		Index index = this.getIndexs().get((int) f);
+		byte[] values = null;
+		try {
+			values = this.dataFileHelper.read(index.getSkip(), index.getSize());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return values;
 	}
 
 	// end
