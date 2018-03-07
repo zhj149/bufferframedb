@@ -8,22 +8,24 @@ import java.io.IOException;
  * @author sam
  *
  */
-public class CSVFileHelper implements FileHelper<String> {
-
+public class LineStringFileHelper implements FileHelper<String> {
+	
 	/**
-	 *  {@inheritDoc}
+	 * 文件的保存地址
 	 */
-	@Override
-	public boolean drop() throws Exception {
-		return false;
-	}
+	private String url;
+	
+	/**
+	 * 文件操作对象
+	 */
+	private File file;
 
 	/**
 	 *  {@inheritDoc}
 	 */
 	@Override
 	public File getFile() {
-		return null;
+		return this.file;
 	}
 
 	/**
@@ -31,7 +33,7 @@ public class CSVFileHelper implements FileHelper<String> {
 	 */
 	@Override
 	public String getUrl() {
-		return null;
+		return this.url;
 	}
 
 	/**
@@ -39,7 +41,7 @@ public class CSVFileHelper implements FileHelper<String> {
 	 */
 	@Override
 	public void setUrl(String url) {
-		
+		this.url = url;
 	}
 
 	/**
@@ -49,6 +51,15 @@ public class CSVFileHelper implements FileHelper<String> {
 	public boolean readWriteModel() throws IOException {
 		return false;
 	}
+	
+	/**
+	 *  {@inheritDoc}
+	 */
+	@Override
+	public boolean drop() throws Exception {
+		return false;
+	}
+
 
 	/**
 	 *  {@inheritDoc}
@@ -79,7 +90,6 @@ public class CSVFileHelper implements FileHelper<String> {
 	 */
 	@Override
 	public void write(String t) throws Exception {
-		
 	}
 
 	/**

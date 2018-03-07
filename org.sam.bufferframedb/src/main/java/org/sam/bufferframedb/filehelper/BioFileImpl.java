@@ -29,7 +29,7 @@ public class BioFileImpl implements FileHelper<byte[]> {
 	 */
 	@Override
 	public void setUrl(String url) {
-		this.url = url;
+			this.url = url;
 	}
 
 	/**
