@@ -6,11 +6,12 @@ import java.io.RandomAccessFile;
 
 /**
  * bio的file文件操作对象
+ * 
  * @author sam
  *
  */
 public class BioFileImpl implements FileHelper<byte[]> {
-	
+
 	/**
 	 * 文件的保存地址
 	 */
@@ -29,30 +30,32 @@ public class BioFileImpl implements FileHelper<byte[]> {
 	 */
 	@Override
 	public void setUrl(String url) {
-			this.url = url;
+		this.url = url;
 	}
 
 	/**
 	 * 当前操作的文件对象
 	 */
-	private File file;
-	
+	protected File file;
+
 	/**
 	 * 当前操作的文件对象
+	 * 
 	 * @return
 	 */
 	@Override
 	public File getFile() {
 		return file;
 	}
-	
+
 	/**
 	 * 文件随机访问对象工具
 	 */
-	private RandomAccessFile randomFile;
-	
+	protected RandomAccessFile randomFile;
+
 	/**
 	 * 文件随机访问对象工具
+	 * 
 	 * @return
 	 */
 	public RandomAccessFile getRandomFile() {
@@ -61,24 +64,25 @@ public class BioFileImpl implements FileHelper<byte[]> {
 
 	/**
 	 * 创建文件的地址
+	 * 
 	 * @param url
 	 */
-	public BioFileImpl(String url){
+	public BioFileImpl(String url) {
 		this.setUrl(url);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean readWriteModel() throws IOException {
 		this.file = new File(this.url);
-		if (!this.file.exists()){
+		if (!this.file.exists()) {
 			if (!this.file.createNewFile())
 				return false;
 		}
-		
-		//只读模式文件访问工具
+
+		// 只读模式文件访问工具
 		randomFile = new RandomAccessFile(this.file, "rw");
 		return true;
 	}
@@ -90,13 +94,13 @@ public class BioFileImpl implements FileHelper<byte[]> {
 	public boolean writeModel() throws IOException {
 		this.file = new File(this.url);
 		this.file.delete();
-		
+
 		if (!this.file.createNewFile())
 			return false;
-		
-		//只读模式文件访问工具
+
+		// 只读模式文件访问工具
 		randomFile = new RandomAccessFile(this.file, "rw");
-		
+
 		return true;
 	}
 
@@ -108,25 +112,25 @@ public class BioFileImpl implements FileHelper<byte[]> {
 		this.file = new File(this.url);
 		if (!this.file.exists())
 			return false;
-		
-		//只读模式文件访问工具
+
+		// 只读模式文件访问工具
 		randomFile = new RandomAccessFile(this.file, "r");
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	public void seek(long seek) throws Exception{
+	public void seek(long seek) throws Exception {
 		randomFile.seek(seek);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void append(byte[] t) throws Exception{
+	public void append(byte[] t) throws Exception {
 		randomFile.seek(randomFile.length());
 		randomFile.write(t);
 	}
@@ -154,7 +158,7 @@ public class BioFileImpl implements FileHelper<byte[]> {
 	@Override
 	public byte[] read() throws Exception {
 		long length = randomFile.length();
-		byte[] bytes = new byte[(int)length];
+		byte[] bytes = new byte[(int) length];
 		randomFile.seek(0);
 		randomFile.read(bytes);
 		return bytes;
@@ -165,7 +169,7 @@ public class BioFileImpl implements FileHelper<byte[]> {
 	 */
 	@Override
 	public byte[] read(long seek, int length) throws Exception {
-		byte[] block = new byte[(int)length];
+		byte[] block = new byte[(int) length];
 		randomFile.seek(seek);
 		randomFile.read(block);
 		return block;
@@ -184,7 +188,7 @@ public class BioFileImpl implements FileHelper<byte[]> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean drop() throws Exception{
+	public boolean drop() throws Exception {
 		return this.file.delete();
 	}
 
